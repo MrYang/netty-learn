@@ -7,6 +7,6 @@ public class TimeServerChannelInitializer extends ChannelInitializer<SocketChann
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast(new TimeServerHandler());
+        ch.pipeline().addLast(new TimeEncoder2(), new TimeServerHandler());
     }
 }
