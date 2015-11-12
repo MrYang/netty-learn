@@ -7,6 +7,6 @@ public class TimeClientChannelInitializer extends ChannelInitializer<SocketChann
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast(new TimeClientHandler());
+        ch.pipeline().addLast(new TimeDecoder(), new TimeClientHandler());
     }
 }
