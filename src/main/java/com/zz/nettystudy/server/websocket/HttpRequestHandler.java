@@ -35,7 +35,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
         if (wsUri.equalsIgnoreCase(request.getUri())) {
             ctx.fireChannelRead(request.retain());
         } else {
@@ -44,8 +44,10 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             }
 
             RandomAccessFile file = new RandomAccessFile(INDEX, "r");
-            HttpResponse response = new DefaultFullHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
+
+            HttpResponse response = new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.OK);
             response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/html; charset=UTF-8");
+
             boolean keepAlive = HttpHeaders.isKeepAlive(request);
 
             if (keepAlive) {
@@ -59,7 +61,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             } else {
                 ctx.write(new ChunkedNioFile(file.getChannel()));
             }
-
             ChannelFuture future = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
             if (!keepAlive) {
                 future.addListener(ChannelFutureListener.CLOSE);
@@ -70,9 +71,11 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
         Channel incoming = ctx.channel();
         System.out.println("Client:" + incoming.remoteAddress() + "异常");
+        // 当出现异常就关闭连接
         cause.printStackTrace();
         ctx.close();
     }

@@ -27,25 +27,21 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
-
-        // Broadcast a message to multiple Channels
-        channels.writeAndFlush(new TextWebSocketFrame("[SERVER] - " + incoming.remoteAddress() + " 加入"));
-
-        channels.add(incoming);
+        for (Channel channel : channels) {
+            channel.writeAndFlush(new TextWebSocketFrame("[SERVER] - " + incoming.remoteAddress() + " 加入"));
+        }
+        channels.add(ctx.channel());
         System.out.println("Client:" + incoming.remoteAddress() + "加入");
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
-
-        // Broadcast a message to multiple Channels
-        channels.writeAndFlush(new TextWebSocketFrame("[SERVER] - " + incoming.remoteAddress() + " 离开"));
-
+        for (Channel channel : channels) {
+            channel.writeAndFlush(new TextWebSocketFrame("[SERVER] - " + incoming.remoteAddress() + " 离开"));
+        }
         System.out.println("Client:" + incoming.remoteAddress() + "离开");
-
-        // A closed Channel is automatically removed from ChannelGroup,
-        // so there is no need to do "channels.remove(ctx.channel());"
+        channels.remove(ctx.channel());
     }
 
     @Override
@@ -61,7 +57,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
         Channel incoming = ctx.channel();
         System.out.println("Client:" + incoming.remoteAddress() + "异常");
         // 当出现异常就关闭连接

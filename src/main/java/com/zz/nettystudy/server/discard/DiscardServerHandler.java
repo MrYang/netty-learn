@@ -12,10 +12,6 @@ public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf in = (ByteBuf) msg;
         try {
             System.out.println(in.toString(io.netty.util.CharsetUtil.US_ASCII));
-//            while (in.isReadable()) {
-//                System.out.print((char) in.readByte());
-//                System.out.flush();
-//            }
         } finally {
             ReferenceCountUtil.release(msg);
             //in.release();
