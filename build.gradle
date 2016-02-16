@@ -2,8 +2,8 @@ apply plugin: 'java'
 group = "com.zz"
 version = '1.0'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -11,5 +11,6 @@ repositories {
 
 dependencies {
     compile 'io.netty:netty-all:4.0.30.Final'
+    compile 'com.google.guava:guava:19.0'
     testCompile 'junit:junit:4.+'
 }
