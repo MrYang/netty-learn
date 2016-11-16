@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-public class TimeEncoder2 extends MessageToByteEncoder<UnixTime> {
+class TimeEncoder2 extends MessageToByteEncoder<UnixTime> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, UnixTime msg, ByteBuf out) {

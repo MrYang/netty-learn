@@ -27,7 +27,7 @@ class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf in) {
         logger.info("client: channelRead0 event");
 
-        logger.info("client received: " + in.toString(CharsetUtil.UTF_8));
+        logger.info("client: received: " + in.toString(CharsetUtil.UTF_8));
     }
 
     /**
