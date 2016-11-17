@@ -6,27 +6,24 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChatServer {
 
+    private Logger logger = LoggerFactory.getLogger(ChatServer.class);
+
     private int port;
 
-    public ChatServer(int port) {
+    private ChatServer(int port) {
         this.port = port;
     }
 
     public static void main(String[] args) throws Exception {
-        int port;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);
-        } else {
-            port = 9527;
-        }
-
-        new ChatServer(port).run();
+        new ChatServer(5000).run();
     }
 
-    public void run() throws Exception {
+    private void run() throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -38,6 +35,7 @@ public class ChatServer {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             ChannelFuture f = b.bind(port).sync();
+            logger.info("start server on port:{}", port);
             f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();

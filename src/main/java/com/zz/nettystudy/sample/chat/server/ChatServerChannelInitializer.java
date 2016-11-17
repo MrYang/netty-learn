@@ -18,7 +18,5 @@ public class ChatServerChannelInitializer extends ChannelInitializer<SocketChann
         pipeline.addLast("decoder", new StringDecoder());
         pipeline.addLast("encoder", new StringEncoder());
         pipeline.addLast("handler", new ChatServerHandler());
-
-        System.out.println("SimpleChatClient:"+ch.remoteAddress() +"连接上");
     }
 }

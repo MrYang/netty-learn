@@ -15,8 +15,8 @@ public class ChatClient {
 
     public static void main(String[] args) throws Exception {
 
-        String host = args[0];
-        int port = Integer.parseInt(args[1]);
+        String host = "127.0.0.1";
+        int port = 5000;
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
@@ -32,7 +32,12 @@ public class ChatClient {
 
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
-                channel.writeAndFlush(in.readLine() + "\r\n");
+                String msg = in.readLine();
+                if ("bye".equals(msg) || msg == null) {
+                    break;
+                }
+
+                channel.writeAndFlush(msg + "\r\n");
             }
         } finally {
             workerGroup.shutdownGracefully();

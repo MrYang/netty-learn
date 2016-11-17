@@ -6,61 +6,61 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ChatServerHandler extends SimpleChannelInboundHandler<String> {
+class ChatServerHandler extends SimpleChannelInboundHandler<String> {
 
-    public static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    private Logger logger = LoggerFactory.getLogger(ChatServer.class);
+
+    private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {  // (2)
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
 
-        // Broadcast a message to multiple Channels
-        channels.writeAndFlush("[SERVER] - " + incoming.remoteAddress() + " 加入\n");
-
-        channels.add(ctx.channel());
+        channels.writeAndFlush("[SERVER] - " + incoming.remoteAddress() + " 加入\r\n");
+        channels.add(incoming);
     }
 
     @Override
-    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {  // (3)
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
 
-        // Broadcast a message to multiple Channels
-        channels.writeAndFlush("[SERVER] - " + incoming.remoteAddress() + " 离开\n");
-
-        // A closed Channel is automatically removed from ChannelGroup,
-        // so there is no need to do "channels.remove(ctx.channel());"
+        channels.writeAndFlush("[SERVER] - " + incoming.remoteAddress() + " 离开\r\n");
+        channels.remove(incoming);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
         Channel incoming = ctx.channel();
         for (Channel channel : channels) {
-            if (channel != incoming){
-                channel.writeAndFlush("[" + incoming.remoteAddress() + "]" + msg + "\n");
+            if (channel != incoming) {
+                channel.writeAndFlush("[" + incoming.remoteAddress() + "] say: " + msg + "\r\n");
             } else {
-                channel.writeAndFlush("[you]" + msg + "\n");
+                channel.writeAndFlush("[you] say: " + msg + "\n");
             }
         }
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception { // (5)
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
-        System.out.println("SimpleChatClient:"+incoming.remoteAddress()+"在线");
+        logger.info("chatClient:{}在线", incoming.remoteAddress());
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception { // (6)
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         Channel incoming = ctx.channel();
-        System.out.println("SimpleChatClient:"+incoming.remoteAddress()+"掉线");
+        channels.remove(incoming);
+        logger.info("chatClient:{}掉线", incoming.remoteAddress());
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Channel incoming = ctx.channel();
-        System.out.println("SimpleChatClient:"+incoming.remoteAddress()+"异常");
-        // 当出现异常就关闭连接
+        logger.info("chatClient:{}异常", incoming.remoteAddress());
+        channels.remove(incoming);
         cause.printStackTrace();
         ctx.close();
     }
