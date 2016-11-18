@@ -33,6 +33,7 @@ public class SessionManager {
                 logger.info("remove channel:{}", channel.remoteAddress());
                 channelGroup.remove(channel);
                 iterator.remove();
+                channel.close();
             }
         }
     };
@@ -64,6 +65,7 @@ public class SessionManager {
     public void remove(Channel channel) {
         channelGroup.remove(channel);
         onlineChannel.remove(channel);
+        channel.close();
     }
 
     public void touch(Channel channel) {

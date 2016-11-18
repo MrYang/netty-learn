@@ -1,6 +1,5 @@
 package com.zz.nettystudy.sample.heartbeat.server;
 
-import com.zz.nettystudy.sample.chat.server.ChatServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -9,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 class HeartbeatServerHandler extends SimpleChannelInboundHandler<String> {
 
-    private Logger logger = LoggerFactory.getLogger(ChatServer.class);
+    private Logger logger = LoggerFactory.getLogger(HeartbeatServerHandler.class);
 
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
