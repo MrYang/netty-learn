@@ -25,6 +25,7 @@ public class TimeClient {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
+                    // client端接收UnixTime消息,需要解码
                     ch.pipeline().addLast(new TimeDecoder(), new TimeClientHandler());
                 }
             });

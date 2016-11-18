@@ -31,7 +31,8 @@ public class TimeServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new TimeEncoder2(), new TimeServerHandler());
+                            // server发送UnixTime,需要编码
+                            ch.pipeline().addLast(new TimeEncoder(), new TimeServerHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)

@@ -11,6 +11,7 @@ class TimeServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(final ChannelHandlerContext ctx) {
         ChannelFuture f = ctx.writeAndFlush(new UnixTime());
+        // 发送UnixTime后关闭连接
         f.addListener(ChannelFutureListener.CLOSE);
     }
 
