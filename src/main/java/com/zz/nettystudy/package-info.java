@@ -1,6 +1,7 @@
 /**
  * ChannelPipeline 类doc写的很清楚
- * ChannelInboundHandler按照注册的先后顺序执行；ChannelOutboundHandler按照注册的先后顺序逆序执行
+ * ChannelInboundHandler按照注册的先后顺序执行,代表从socket网络层发出的事件,典型的处理器如Decoder,将tcp字节流解码为应用层关心的协议报文对象
+ * ChannelOutboundHandler按照注册的先后顺序逆序执行,代表从应用层发出的事件,典型的处理器如Encoder,将协议报文对象编码为字节流，供底层网络发送
  * request->InboundHandler1->InboundHandler2->OutboundHandler2->OutboundHandler1->response
  *
  * p.addLast("1", new InboundHandlerA());
