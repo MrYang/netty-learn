@@ -15,7 +15,7 @@ public class ChatServerChannelInitializer extends ChannelInitializer<SocketChann
         ChannelPipeline pipeline = ch.pipeline();
 
         /**
-         * decode 为入站事件(外部消息进来),处理顺序为顺序执行, 先进行解包,然后组装成字符串,最后到handler处理
+         * decode 为入站事件(外部消息进来),入站事件处理顺序为顺序执行, 先进行解包,然后组装成字符串,最后到handler处理
          * 所以需要把framer排在decoder,handler 之前(framer->decode->handler)
          * encode 为出站事件(内部消息发出去)需要进行编码处理
          * 同理在client 端也需要配置framer,decoder,encoder这几个编解码器

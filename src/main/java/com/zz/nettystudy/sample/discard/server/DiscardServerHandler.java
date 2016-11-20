@@ -14,18 +14,17 @@ class DiscardServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        // 收到消息后,啥也不干,扔掉
         ByteBuf in = (ByteBuf) msg;
         try {
             logger.info("server receive:{}", in.toString(CharsetUtil.UTF_8));
         } finally {
             ReferenceCountUtil.release(msg);
-            //in.release();
         }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        // 当出现异常就关闭连接
         cause.printStackTrace();
         ctx.close();
     }

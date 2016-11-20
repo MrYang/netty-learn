@@ -1,5 +1,7 @@
-package com.zz.nettystudy.sample.discard.server;
+package com.zz.nettystudy.sample.rpc.server;
 
+import com.zz.nettystudy.sample.codec.CodecDecoder;
+import com.zz.nettystudy.sample.codec.CodecEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -8,17 +10,21 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DiscardServer {
+public class RpcServer {
+
+    private Logger logger = LoggerFactory.getLogger(RpcServer.class);
 
     private int port;
 
-    private DiscardServer(int port) {
+    private RpcServer(int port) {
         this.port = port;
     }
 
     public static void main(String[] args) throws Exception {
-        new DiscardServer(5000).run();
+        new RpcServer(5000).run();
     }
 
     private void run() throws Exception {
@@ -28,16 +34,20 @@ public class DiscardServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>(){
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new DiscardServerHandler());
+                            ch.pipeline().addLast(new CodecDecoder());
+                            ch.pipeline().addLast(new CodecEncoder());
+                            ch.pipeline().addLast(new RpcServerHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             ChannelFuture f = b.bind(port).sync();
+            logger.info("start server on port:{}", port);
+
             f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
