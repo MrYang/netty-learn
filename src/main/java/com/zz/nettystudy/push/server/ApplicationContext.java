@@ -36,6 +36,11 @@ public class ApplicationContext {
         deviceChannelMap.remove(deviceId, channel);
     }
 
+    public void removeChannel(Channel channel) {
+        channels.remove(channel);
+        deviceChannelMap.inverse().remove(channel); // 反转后的map修改操作会影响原来的map
+    }
+
     public void addMessage2Queue(Message msg) {
         queue.add(msg);
     }
@@ -48,5 +53,9 @@ public class ApplicationContext {
             // save message
             channel.writeAndFlush(msg);
         }
+    }
+
+    public int statQueue() {
+        return queue.size();
     }
 }

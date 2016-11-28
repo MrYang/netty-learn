@@ -1,12 +1,14 @@
 package com.zz.nettystudy.push.server;
 
 import com.zz.nettystudy.push.common.entity.Message;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@ChannelHandler.Sharable
 public class PushServerHandler extends SimpleChannelInboundHandler<Message> {
 
     @Autowired
@@ -28,6 +30,8 @@ public class PushServerHandler extends SimpleChannelInboundHandler<Message> {
             case Constants.OFF:
                 context.removeChannel(deviceId, ctx.channel());
                 break;
+            case Constants.PING:
+                break;
             default:
                 throw new IllegalArgumentException("不支持该消息类型");
         }
@@ -42,5 +46,7 @@ public class PushServerHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        context.removeChannel(ctx.channel());
+        ctx.close();
     }
 }
