@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class MonitorServerHandler extends ChannelInboundHandlerAdapter {
 
     @Autowired
-    private ApplicationContext context;
+    private AppContext context;
 
     private Logger logger = LoggerFactory.getLogger(MonitorServerHandler.class);
 

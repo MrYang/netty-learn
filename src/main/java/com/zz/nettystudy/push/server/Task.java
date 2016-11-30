@@ -1,6 +1,6 @@
 package com.zz.nettystudy.push.server;
 
-import com.zz.nettystudy.push.common.entity.Message;
+import com.zz.nettystudy.push.common.entity.ServerMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,9 @@ public class Task {
     private Logger logger = LoggerFactory.getLogger(Task.class);
 
     @Autowired
-    private ApplicationContext context;
+    private AppContext context;
 
     private boolean stopPushMessage = false;
-
 
     @Scheduled(initialDelay = 1000, fixedDelay = 6000)
     public void kickOffline() {
@@ -30,7 +29,7 @@ public class Task {
         logger.info("push message");
         while (!stopPushMessage) {
             try {
-                Message message = ApplicationContext.queue.take();
+                ServerMessage message = AppContext.queue.take();
                 while (message != null) {
                     context.pushMessage(message);
                 }
