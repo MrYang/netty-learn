@@ -41,9 +41,13 @@ public class PushServerHandler extends SimpleChannelInboundHandler<ClientMessage
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        AppContext.offline(ctx.channel());
+        ctx.channel().disconnect();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        AppContext.offline(ctx.channel());
+        ctx.channel().disconnect();
     }
 }

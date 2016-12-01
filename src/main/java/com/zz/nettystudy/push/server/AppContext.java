@@ -2,6 +2,7 @@ package com.zz.nettystudy.push.server;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.zz.nettystudy.push.common.entity.Device;
 import com.zz.nettystudy.push.common.entity.ServerMessage;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
@@ -9,53 +10,101 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-@Component
 public class AppContext {
 
-    private Logger logger = LoggerFactory.getLogger(AppContext.class);
+    private static Logger logger = LoggerFactory.getLogger(AppContext.class);
 
     private static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    // device 与 channel 对应map
     private static BiMap<String, Channel> deviceChannelMap = HashBiMap.create();
 
+    // 在线设备
+    public static Map<String, Device> onlineDevice = new HashMap<>();
+
+    // 可以根据消息id把消息放在不同的队列,由多个线程去推送
     public static BlockingQueue<ServerMessage> queue = new LinkedBlockingDeque<>();
 
-    public void addChannel(String deviceId, Channel channel) {
+    public static void online(String deviceId, Channel channel) {
+
+        logger.info("{}设备上线了", deviceId);
+
         channels.add(channel);
         deviceChannelMap.put(deviceId, channel);
+
+        Device device = new Device();
+        device.setId(deviceId);
+        device.setLastHeartTime(LocalDateTime.now());
+        onlineDevice.put(deviceId, device);
+
+        // 搜索该设备的离线消息,并加入到队列发送
     }
 
-    public void removeChannel(String deviceId, Channel channel) {
+    public static void offline(String deviceId, Channel channel) {
+        logger.info("{}设备下线了, 主动下线", deviceId);
+
         channels.remove(channel);
         deviceChannelMap.remove(deviceId, channel);
+
+        onlineDevice.remove(deviceId);
     }
 
-    public void removeChannel(Channel channel) {
+    public static void offline(Channel channel) {
         channels.remove(channel);
-        deviceChannelMap.inverse().remove(channel); // 反转后的map修改操作会影响原来的map
+        BiMap<Channel, String> biMap = deviceChannelMap.inverse();
+        String deviceId = biMap.get(channel);
+
+        logger.info("{}设备下线了", deviceId);
+
+        deviceChannelMap.remove(deviceId); // 反转后的map修改操作会影响原来的map
+        onlineDevice.remove(deviceId);
     }
 
-    public void addMessage2Queue(ServerMessage msg) {
-        queue.add(msg);
+    public static void offline(String deviceId) {
+        logger.info("{}设备下线了,长时间没有心跳", deviceId);
+        deviceChannelMap.remove(deviceId);
+        channels.remove(deviceChannelMap.get(deviceId));
+        onlineDevice.remove(deviceId);
     }
 
-    public void pushMessage(ServerMessage msg) {
+    public static void ping(String deviceId) {
+        logger.info("{} 发送ping消息", deviceId);
+        Device device = onlineDevice.get(deviceId);
+        device.setLastHeartTime(LocalDateTime.now());
+        onlineDevice.put(deviceId, device);
+    }
+
+    public static void addMessage2Queue(List<ServerMessage> msg) {
+        queue.addAll(msg);
+    }
+
+    public static void pushMessage(ServerMessage msg) {
         String deviceId = msg.getDeviceId();
         Channel channel = deviceChannelMap.get(deviceId);
         if (channel != null) {
-            msg.setPushTime(LocalDateTime.now());
-            // save message
-            channel.writeAndFlush(msg);
+            if (isOnline(deviceId)) {
+                logger.info("推送消息给{}", deviceId);
+                msg.setPushTime(LocalDateTime.now());
+                channel.writeAndFlush(msg);
+            } else {
+                logger.info("保存离线消息:{}给{}", msg, deviceId);
+            }
         }
     }
 
-    public int statQueue() {
+    public static int statQueue() {
         return queue.size();
+    }
+
+    public static boolean isOnline(String deviceId) {
+        return onlineDevice.containsKey(deviceId);
     }
 }

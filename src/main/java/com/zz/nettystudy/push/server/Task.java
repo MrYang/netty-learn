@@ -1,43 +1,45 @@
 package com.zz.nettystudy.push.server;
 
+import com.zz.nettystudy.push.common.entity.Device;
 import com.zz.nettystudy.push.common.entity.ServerMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.Iterator;
 
 @Component
 public class Task {
 
     private Logger logger = LoggerFactory.getLogger(Task.class);
 
-    @Autowired
-    private AppContext context;
-
     private boolean stopPushMessage = false;
 
-    @Scheduled(initialDelay = 1000, fixedDelay = 6000)
+    @Scheduled(initialDelay = 1000, fixedDelay = 30000)
     public void kickOffline() {
-        logger.info("start kick offline task");
+        Iterator<String> iterator = AppContext.onlineDevice.keySet().iterator();
+        while (iterator.hasNext()) {
+            String deviceId = iterator.next();
+            Device device = AppContext.onlineDevice.get(deviceId);
+            if (device.getLastHeartTime().plusMinutes(3).isBefore(LocalDateTime.now())) {
+                AppContext.offline(deviceId);
+                iterator.remove();
+            }
+        }
     }
 
     @PostConstruct
     public void pushMessage() {
-        logger.info("push message");
         while (!stopPushMessage) {
             try {
                 ServerMessage message = AppContext.queue.take();
-                while (message != null) {
-                    context.pushMessage(message);
-                }
+                AppContext.pushMessage(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-
         }
     }
 

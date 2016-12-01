@@ -22,27 +22,19 @@ public class ClientMessageProcessor {
         executorService.execute(() -> {
             switch (message.getType()) {
                 case Constants.MESSAGE_TYPE_ON:
-                    on(channel, message);
+                    AppContext.online(message.getDeviceId(), channel);
                     break;
                 case Constants.MESSAGE_TYPE_OFF:
+                    AppContext.offline(message.getDeviceId(), channel);
                     break;
                 case Constants.MESSAGE_TYPE_PING:
+                    AppContext.ping(message.getDeviceId());
                     break;
                 case Constants.MESSAGE_TYPE_RECEIPT:
                     break;
+                default:
+                    throw new IllegalArgumentException("不能处理该消息");
             }
         });
-    }
-
-    private void on(Channel channel, ClientMessage message) {
-
-    }
-
-    private void off(Channel channel, ClientMessage message) {
-
-    }
-
-    private void ping(Channel channel, ClientMessage message) {
-
     }
 }
