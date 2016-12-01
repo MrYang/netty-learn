@@ -49,6 +49,7 @@ public class RouterProcessor {
                     serverMessage.setCreateTime(LocalDateTime.now());
                     serverMessage.setReceipt(false);
                     AppContext.addMessage2Queue(Lists.newArrayList(serverMessage));
+                    text = "ok";
                 }
                 break;
             default:

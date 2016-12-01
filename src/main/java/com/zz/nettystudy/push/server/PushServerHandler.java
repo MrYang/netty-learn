@@ -7,11 +7,15 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 @ChannelHandler.Sharable
 public class PushServerHandler extends SimpleChannelInboundHandler<ClientMessage> {
+
+    private Logger logger = LoggerFactory.getLogger(PushServerHandler.class);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -29,6 +33,7 @@ public class PushServerHandler extends SimpleChannelInboundHandler<ClientMessage
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE) {
+                AppContext.offline(ctx.channel());
                 ctx.channel().disconnect();
             }
         } else {

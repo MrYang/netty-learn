@@ -1,5 +1,7 @@
 package com.zz.nettystudy.push.common.entity;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 
 public class ClientMessage implements Serializable {
@@ -29,5 +31,9 @@ public class ClientMessage implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

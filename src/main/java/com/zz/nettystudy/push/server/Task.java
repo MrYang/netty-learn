@@ -4,7 +4,6 @@ import com.zz.nettystudy.push.common.entity.Device;
 import com.zz.nettystudy.push.common.entity.ServerMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +17,10 @@ public class Task {
 
     private boolean stopPushMessage = false;
 
-    @Scheduled(initialDelay = 1000, fixedDelay = 30000)
+    /**
+     * 设置了IdleStateHandler 之后,好像都不需要定时清除下线列表了
+     */
+    //@Scheduled(initialDelay = 1000, fixedDelay = 30000)
     public void kickOffline() {
         Iterator<String> iterator = AppContext.onlineDevice.keySet().iterator();
         while (iterator.hasNext()) {

@@ -43,7 +43,7 @@ public class PushServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(90, 0, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new CodecDecoder());
                         ch.pipeline().addLast(new CodecEncoder());
                         ch.pipeline().addLast(pushServerHandler);

@@ -1,5 +1,7 @@
 package com.zz.nettystudy.push.common.entity;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -69,5 +71,9 @@ public class ServerMessage implements Serializable {
 
     public void setReceipt(boolean receipt) {
         this.receipt = receipt;
+    }
+
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }
