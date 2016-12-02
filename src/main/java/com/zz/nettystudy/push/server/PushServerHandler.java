@@ -24,6 +24,7 @@ public class PushServerHandler extends SimpleChannelInboundHandler<ClientMessage
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ClientMessage msg) throws Exception {
+        logger.info("client msg:{}", msg);
         Channel channel = ctx.channel();
         new ClientMessageProcessor(channel, msg).process();
     }

@@ -9,4 +9,7 @@ public class Constants {
 
     public final static String CLINET_DEVICE_ID = "12:34:56:78:90";
 
+    public final static int SERVER_MESSAGE_ONLINE = 0;
+    public final static int SERVER_MESSAGE_OFFLINE = 1;
+
 }

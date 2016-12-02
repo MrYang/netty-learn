@@ -2,11 +2,17 @@ package com.zz.nettystudy.push.common.entity;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+@Table(name = "message")
+@Entity
 public class ServerMessage implements Serializable {
 
+    @Id
     private String id;  // 消息id
     private String deviceId;
     private String title;
@@ -16,6 +22,8 @@ public class ServerMessage implements Serializable {
     private LocalDateTime pushTime;
 
     private boolean receipt;    // 是否需要回执
+
+    private int online;   // 0,在线, 1,离线
 
     public String getId() {
         return id;
@@ -71,6 +79,14 @@ public class ServerMessage implements Serializable {
 
     public void setReceipt(boolean receipt) {
         this.receipt = receipt;
+    }
+
+    public int getOnline() {
+        return online;
+    }
+
+    public void setOnline(int online) {
+        this.online = online;
     }
 
     public String toString() {

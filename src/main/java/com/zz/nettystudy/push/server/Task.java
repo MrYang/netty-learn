@@ -18,7 +18,7 @@ public class Task {
     private boolean stopPushMessage = false;
 
     /**
-     * 设置了IdleStateHandler 之后,好像都不需要定时清除下线列表了
+     * 设置了IdleStateHandler 之后,貌似都不需要定时清除下线列表了
      */
     //@Scheduled(initialDelay = 1000, fixedDelay = 30000)
     public void kickOffline() {

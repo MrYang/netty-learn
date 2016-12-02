@@ -29,6 +29,9 @@ public class PushServer {
     @Value("${server.port:5000}")
     private int port;
 
+    @Value("${heartbeat.timeout:90}")
+    private int timeout;
+
     @Autowired
     private PushServerHandler pushServerHandler;
 
@@ -43,7 +46,7 @@ public class PushServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new IdleStateHandler(90, 0, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(timeout, 0, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new CodecDecoder());
                         ch.pipeline().addLast(new CodecEncoder());
                         ch.pipeline().addLast(pushServerHandler);

@@ -2,8 +2,10 @@ package com.zz.nettystudy.push.server;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.zz.nettystudy.push.common.Constants;
 import com.zz.nettystudy.push.common.entity.Device;
 import com.zz.nettystudy.push.common.entity.ServerMessage;
+import com.zz.nettystudy.push.server.repository.MessageRepository;
 import io.netty.channel.Channel;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -30,6 +32,8 @@ public class AppContext {
     // 在线设备
     public static Map<String, Device> onlineDevice = new HashMap<>();
 
+    public static MessageRepository messageRepository = SpringContext.getBean(MessageRepository.class);
+
     // 可以根据消息id把消息放在不同的队列,由多个线程去推送
     public static BlockingQueue<ServerMessage> queue = new LinkedBlockingDeque<>();
 
@@ -46,6 +50,8 @@ public class AppContext {
         onlineDevice.put(deviceId, device);
 
         // 搜索该设备的离线消息,并加入到队列发送
+        List<ServerMessage> msg = messageRepository.findByDeviceId(deviceId);
+        msg.forEach(AppContext::addMessage2Queue);
     }
 
     public static void offline(String deviceId, Channel channel) {
@@ -82,8 +88,12 @@ public class AppContext {
         onlineDevice.put(deviceId, device);
     }
 
-    public static void addMessage2Queue(List<ServerMessage> msg) {
-        queue.addAll(msg);
+    public static void addMessage2Queue(ServerMessage msg) {
+        try {
+            queue.put(msg);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void pushMessage(ServerMessage msg) {
@@ -91,17 +101,31 @@ public class AppContext {
         Channel channel = deviceChannelMap.get(deviceId);
         if (channel != null) {
             if (isOnline(deviceId)) {
-                logger.info("推送消息给{}", deviceId);
                 msg.setPushTime(LocalDateTime.now());
+                logger.info("推送消息给{}", deviceId);
                 channel.writeAndFlush(msg);
+
+                if (msg.getOnline() == Constants.SERVER_MESSAGE_OFFLINE) {
+                    messageRepository.delete(msg.getId());
+                }
             } else {
+                msg.setOnline(Constants.SERVER_MESSAGE_OFFLINE);
+                messageRepository.save(msg);
                 logger.info("保存离线消息:{}给{}", msg, deviceId);
             }
+        } else {
+            msg.setOnline(Constants.SERVER_MESSAGE_OFFLINE);
+            messageRepository.save(msg);
+            logger.info("保存离线消息:{}给{}", msg, deviceId);
         }
     }
 
     public static int statQueue() {
         return queue.size();
+    }
+
+    public static int onlineSize() {
+        return onlineDevice.size();
     }
 
     public static boolean isOnline(String deviceId) {

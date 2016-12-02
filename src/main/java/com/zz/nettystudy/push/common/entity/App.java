@@ -1,7 +1,16 @@
 package com.zz.nettystudy.push.common.entity;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table
 public class App {
 
+    @Id
+    @GeneratedValue
     private long id;
 
     private String appKey;

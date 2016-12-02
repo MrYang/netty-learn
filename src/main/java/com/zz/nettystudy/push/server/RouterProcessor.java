@@ -1,6 +1,5 @@
 package com.zz.nettystudy.push.server;
 
-import com.google.common.collect.Lists;
 import com.zz.nettystudy.push.common.entity.ServerMessage;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -28,7 +27,7 @@ public class RouterProcessor {
         String text = "";
         switch (path) {
             case "/queue":
-                text = "size:" + AppContext.statQueue();
+                text = "msg queue size:" + AppContext.statQueue();
                 break;
             case "/online":
                 List<String> deviceIds = queryStringDecoder.parameters().get("deviceId");
@@ -48,8 +47,8 @@ public class RouterProcessor {
                     serverMessage.setContent("msg content");
                     serverMessage.setCreateTime(LocalDateTime.now());
                     serverMessage.setReceipt(false);
-                    AppContext.addMessage2Queue(Lists.newArrayList(serverMessage));
-                    text = "ok";
+                    AppContext.addMessage2Queue(serverMessage);
+                    text = "push msg ok";
                 }
                 break;
             default:
