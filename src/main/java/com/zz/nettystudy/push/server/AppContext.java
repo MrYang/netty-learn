@@ -86,8 +86,13 @@ public class AppContext {
     public static void ping(String deviceId) {
         logger.info("{} 发送ping消息", deviceId);
         Device device = onlineDevice.get(deviceId);
-        device.setLastHeartTime(LocalDateTime.now());
-        onlineDevice.put(deviceId, device);
+        if (device != null) {
+            device.setLastHeartTime(LocalDateTime.now());
+            onlineDevice.put(deviceId, device);
+            return;
+        }
+
+        logger.warn("warn device ping:{}", deviceId);
     }
 
     public static void addMessage2Queue(ServerMessage msg) {

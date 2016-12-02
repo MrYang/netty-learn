@@ -16,8 +16,15 @@ class AppClientHandler extends SimpleChannelInboundHandler<ServerMessage> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
+        ctx.close();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        logger.info("channel inactive");
+        Task.close();
         ctx.close();
     }
 }

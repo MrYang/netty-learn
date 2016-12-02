@@ -34,6 +34,7 @@ public class PushServerHandler extends SimpleChannelInboundHandler<ClientMessage
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE) {
+                logger.info("reader idle");
                 AppContext.offline(ctx.channel());
                 ctx.channel().disconnect();
             }
@@ -47,12 +48,14 @@ public class PushServerHandler extends SimpleChannelInboundHandler<ClientMessage
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.info("exceptionCaught");
         AppContext.offline(ctx.channel());
         ctx.channel().disconnect();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        logger.info("channel inactive");
         AppContext.offline(ctx.channel());
         ctx.channel().disconnect();
     }

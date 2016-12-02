@@ -22,6 +22,12 @@ public class AppClient {
     private String host = "127.0.0.1";
     public static Channel channel;
 
+    private String deviceId;
+
+    public AppClient(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
     public void start() throws InterruptedException {
         try {
             Bootstrap b = new Bootstrap();
@@ -39,34 +45,30 @@ public class AppClient {
 
             ChannelFuture f = b.connect(host, port).sync();
             f.addListener((ChannelFutureListener) future -> {
-                logger.info("connect to server: {}:{}", host, port);
+                logger.info("{} connect to server: {}:{}", deviceId, host, port);
 
                 // 发送上线消息
                 channel = f.channel();
                 ClientMessage onMsg = new ClientMessage();
                 onMsg.setType(Constants.MESSAGE_TYPE_ON);
-                onMsg.setDeviceId(Constants.CLINET_DEVICE_ID);
+                onMsg.setDeviceId(deviceId);
                 onMsg.setContent("1");  // appId
                 channel.writeAndFlush(onMsg);
 
-                new Task().heartbeat();
+                new Task().heartbeat(deviceId);
             });
 
-            f.channel().closeFuture().addListener((ChannelFutureListener) future -> {
-                logger.info("disconnect to server: {}:{}", host, port);
-
-                // 发送下线消息
-                ClientMessage offMsg = new ClientMessage();
-                offMsg.setType(Constants.MESSAGE_TYPE_OFF);
-                offMsg.setDeviceId(Constants.CLINET_DEVICE_ID);
-                channel.writeAndFlush(offMsg);
-            }).sync();
+            f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new AppClient().start();
+        String deviceId = Constants.DEFAULT_CLIENT_DEVICE_ID;
+        if (args.length > 0) {
+            deviceId = args[0];
+        }
+        new AppClient(deviceId).start();
     }
 }

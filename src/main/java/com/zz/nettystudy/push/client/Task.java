@@ -15,14 +15,18 @@ public class Task {
     private Logger logger = LoggerFactory.getLogger(Task.class);
     private static ScheduledExecutorService pool = Executors.newScheduledThreadPool(1);
 
-    public void heartbeat() {
+    public void heartbeat(String deviceId) {
         pool.scheduleAtFixedRate(() -> {
-            logger.info("start heartbeat:{}", LocalDateTime.now());
+            logger.info("{} start heartbeat:{}", deviceId, LocalDateTime.now());
 
             ClientMessage heartMsg = new ClientMessage();
             heartMsg.setType(Constants.MESSAGE_TYPE_PING);
-            heartMsg.setDeviceId(Constants.CLINET_DEVICE_ID);
+            heartMsg.setDeviceId(deviceId);
             AppClient.channel.writeAndFlush(heartMsg);
         }, 5, 30, TimeUnit.SECONDS);
+    }
+
+    public static void close() {
+        pool.shutdown();
     }
 }
