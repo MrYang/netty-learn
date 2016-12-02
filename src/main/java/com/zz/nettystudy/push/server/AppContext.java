@@ -3,6 +3,7 @@ package com.zz.nettystudy.push.server;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.zz.nettystudy.push.common.Constants;
+import com.zz.nettystudy.push.common.entity.ClientMessage;
 import com.zz.nettystudy.push.common.entity.Device;
 import com.zz.nettystudy.push.common.entity.ServerMessage;
 import com.zz.nettystudy.push.server.repository.MessageRepository;
@@ -37,8 +38,8 @@ public class AppContext {
     // 可以根据消息id把消息放在不同的队列,由多个线程去推送
     public static BlockingQueue<ServerMessage> queue = new LinkedBlockingDeque<>();
 
-    public static void online(String deviceId, Channel channel) {
-
+    public static void online(ClientMessage message, Channel channel) {
+        String deviceId = message.getDeviceId();
         logger.info("{}设备上线了", deviceId);
 
         channels.add(channel);
@@ -46,6 +47,7 @@ public class AppContext {
 
         Device device = new Device();
         device.setId(deviceId);
+        device.setAppId(Long.valueOf(message.getContent()));
         device.setLastHeartTime(LocalDateTime.now());
         onlineDevice.put(deviceId, device);
 

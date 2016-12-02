@@ -46,6 +46,7 @@ public class AppClient {
                 ClientMessage onMsg = new ClientMessage();
                 onMsg.setType(Constants.MESSAGE_TYPE_ON);
                 onMsg.setDeviceId(Constants.CLINET_DEVICE_ID);
+                onMsg.setContent("1");  // appId
                 channel.writeAndFlush(onMsg);
 
                 new Task().heartbeat();

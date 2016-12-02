@@ -1,17 +1,12 @@
 package com.zz.nettystudy.push.common.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Table
-@Entity
-public class Device {
+public class Device implements Serializable {
 
-    @Id
     private String id;  // mac
-    private String appId;
+    private long appId;
     private LocalDateTime lastHeartTime;    // 上次心跳时间
 
     public String getId() {
@@ -22,11 +17,11 @@ public class Device {
         this.id = id;
     }
 
-    public String getAppId() {
+    public long getAppId() {
         return appId;
     }
 
-    public void setAppId(String appId) {
+    public void setAppId(long appId) {
         this.appId = appId;
     }
 

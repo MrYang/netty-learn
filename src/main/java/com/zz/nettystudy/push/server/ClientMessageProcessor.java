@@ -23,7 +23,7 @@ public class ClientMessageProcessor {
         executorService.execute(() -> {
             switch (message.getType()) {
                 case Constants.MESSAGE_TYPE_ON:
-                    AppContext.online(message.getDeviceId(), channel);
+                    AppContext.online(message, channel);
                     break;
                 case Constants.MESSAGE_TYPE_OFF:
                     AppContext.offline(message.getDeviceId(), channel);

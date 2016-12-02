@@ -51,6 +51,9 @@ public class RouterProcessor {
                     text = "push msg ok";
                 }
                 break;
+            case "/onlineSize":
+                text = "online device size:" + AppContext.onlineSize();
+                break;
             default:
                 text = "ok";
         }
