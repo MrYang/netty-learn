@@ -37,23 +37,12 @@ public class CodecClient {
             });
 
             ChannelFuture f = b.connect(host, port).sync();
-            f.addListener(new ChannelFutureListener() {
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess()) {
-                        logger.info("client connected success");
-                        // 连上服务器后发送一个request消息
-                        Request request = new Request();
-                        request.setId("1");
-                        request.setType(1);
-                        request.setBody("request body");
-                        request.setHeaders(new HashMap<>());
-                        f.channel().writeAndFlush(request);
-                    } else {
-                        logger.info("client connected failed");
-                        future.cause().printStackTrace();
-                    }
-                }
-            });
+            Request request = new Request();
+            request.setId("1");
+            request.setType(1);
+            request.setBody("request body");
+            request.setHeaders(new HashMap<>());
+            f.channel().writeAndFlush(request).sync();
 
             f.channel().closeFuture().sync();
         } finally {

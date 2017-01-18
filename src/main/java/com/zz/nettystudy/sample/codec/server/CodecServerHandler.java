@@ -2,6 +2,7 @@ package com.zz.nettystudy.sample.codec.server;
 
 import com.zz.nettystudy.common.entity.Request;
 import com.zz.nettystudy.common.entity.Response;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ class CodecServerHandler extends SimpleChannelInboundHandler<Request> {
         response.setId(msg.getId());
         response.setStatusCode(200);
         response.setResult("response body");
-        ctx.writeAndFlush(response);
+        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override
